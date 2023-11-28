@@ -12,6 +12,9 @@ delta = {
 }
 
 
+
+
+
 def check_bound(rct: pg.Rect) -> tuple[bool, bool]:
     """
     オブジェクトが画面内or画面外を判定し、真理値タプルを返す関数
@@ -32,42 +35,83 @@ def main():
     screen = pg.display.set_mode((WIDTH, HEIGHT))
     bg_img = pg.image.load("ex02/fig/pg_bg.jpg")
     kk_img = pg.image.load("ex02/fig/3.png")
-    kk_img = pg.transform.rotozoom(kk_img, 0, 2.0)
+    kk_img = pg.transform.rotozoom(kk_img, 0, 1.0)
+    
+    lst=[]
+    x=0
+    for i in range(8):
+        kk = pg.transform.rotozoom(kk_img, x, 2.0)
+        lst.append(kk)
+        x += 45
+
+    
     kk_rct = kk_img.get_rect()
     kk_rct.center = 900, 400  #コウカトン初期座標
     bomb = pg.Surface((20, 20))  # 練習1:透明のSurfaceを作る
     pg.draw.circle(bomb, (255, 0, 0), (10, 10), 10)  # 練習1:半径10の円を生成
+
     bomb_rct = bomb.get_rect()  #練習2:爆弾を
     bomb_rct.centerx = random.randint(0, WIDTH)
     bomb_rct.centery = random.randint(0, HEIGHT)
     bomb.set_colorkey((0, 0, 0))
-    vx, vy = +5, +5
+    vx, vy = +5, +5  # 横速度、縦速度
 
     clock = pg.time.Clock()
     tmr = 0
+    s=0
+    time=50
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT: 
                 return
             
-        if kk_rct.colliderect(bomb_rct):
+        if kk_rct.colliderect(bomb_rct):  # 爆弾が当たったら
+            kk_img = pg.image.load("ex02/fig/4.png")
+            kk_img = pg.transform.rotozoom(kk_img, 0, 2.0)
+            time=0
+        if time ==30:
             print("GameOver")
             return
+        time +=1
+        
+
             
         key_lst= pg.key.get_pressed()
         sum_mv = [0,0]
         for k, tpl in delta.items():
             if key_lst[k]:  # 練習2　キーが押されたら
                 sum_mv[0] += tpl[0]
-                sum_mv[1] += tpl[1]
+                sum_mv[1] += tpl[1]  #UP,DOWN
+
+                if sum_mv[0] == -5 and sum_mv[1] == 5:
+                    s=1
+                elif sum_mv[0] == 0 and sum_mv[1] == 5:
+                    s=2
+                elif sum_mv[0] == 5 and sum_mv[1] == 5:
+                    s=3
+                elif sum_mv[0] == 5 and sum_mv[1] == 0:
+                    s=4
+                elif sum_mv[0] == 5 and sum_mv[1] == -5:
+                    s=5
+                elif sum_mv[0] == 0 and sum_mv[1] == -5:
+                    s=6
+                elif sum_mv[0] == -5 and sum_mv[1] == -5:
+                    s=7
+                else:
+                    s=0
 
 
         screen.blit(bg_img, [0, 0])
         kk_rct.move_ip(sum_mv[0], sum_mv[1])
+
         if check_bound(kk_rct) != (True, True):
             kk_rct.move_ip(-sum_mv[0], -sum_mv[1])
+        newimg = lst[s]
+        if time<= 30:
+            newimg = kk_img
+        screen.blit(newimg, kk_rct)
 
-        screen.blit(kk_img, kk_rct)
+        # 爆弾
         bomb_rct.move_ip(vx, vy)
         yoko, tate = check_bound(bomb_rct)
         if not yoko:
