@@ -43,13 +43,16 @@ def main():
     bomb.set_colorkey((0, 0, 0))
     vx, vy = +5, +5
 
-
     clock = pg.time.Clock()
     tmr = 0
     while True:
         for event in pg.event.get():
             if event.type == pg.QUIT: 
                 return
+            
+        if kk_rct.colliderect(bomb_rct):
+            print("GameOver")
+            return
             
         key_lst= pg.key.get_pressed()
         sum_mv = [0,0]
