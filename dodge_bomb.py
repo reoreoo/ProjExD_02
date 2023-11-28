@@ -17,6 +17,8 @@ def main():
     bomb_rct.centerx = random.randint(0, WIDTH)
     bomb_rct.centery = random.randint(0, HEIGHT)
     bomb.set_colorkey((0, 0, 0))
+    vx, vy = +5, +5
+
 
     clock = pg.time.Clock()
     tmr = 0
@@ -27,6 +29,7 @@ def main():
 
         screen.blit(bg_img, [0, 0])
         screen.blit(kk_img, [900, 400])
+        bomb_rct.move_ip(vx, vy)
         screen.blit(bomb, bomb_rct)
         
         pg.display.update()
